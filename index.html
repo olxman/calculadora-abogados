@@ -85,20 +85,28 @@ complejidad:{baja:{nombre:"Baja",mult:0.8},media:{nombre:"Media",mult:1.0},alta:
 ubicacion:{santiago:{nombre:"Santiago/RM",mult:1.0},regiones_grandes:{nombre:"Valparaíso/Concepción",mult:0.9},regiones_medianas:{nombre:"Regiones Medianas",mult:0.85},regiones_pequenas:{nombre:"Regiones Pequeñas",mult:0.75}},
 experiencia:{junior:{nombre:"Junior (0-3 años)",mult:0.7},medio:{nombre:"Medio (4-10 años)",mult:1.0},senior:{nombre:"Senior (10+ años)",mult:1.4},especialista:{nombre:"Especialista",mult:1.8}}
 };
+const IVA=0.19;
 const generarPDF=(cotizacion,datosCliente,datosEstudio,valorUF)=>{
-const formatCLP=(n)=>new Intl.NumberFormat('es-CL').format(n);
+const formatCLP=(n)=>new Intl.NumberFormat('es-CL').format(Math.round(n));
 const fecha=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
 const folio=`COT-${Date.now().toString().slice(-8)}`;
 const logoHeader=datosEstudio.logo?`<img src="${datosEstudio.logo}" alt="Logo" style="max-height:70px;max-width:200px;object-fit:contain;">`:`<span style="font-size:48px;">⚖️</span>`;
+const neto=cotizacion.precioNeto;
+const iva=Math.round(neto*0.19);
+const total=neto+iva;
+const ufNeto=(neto/valorUF).toFixed(2);
+const ufTotal=(total/valorUF).toFixed(2);
 const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cotización ${folio}</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;line-height:1.5;padding:40px;max-width:800px;margin:0 auto}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1a365d;padding-bottom:20px;margin-bottom:30px}.logo-section{display:flex;align-items:center;gap:15px}.company-info h1{color:#1a365d;font-size:20px;margin-bottom:5px}.company-info p{color:#4a5568;font-size:11px}.doc-info{text-align:right}.doc-info h2{color:#1a365d;font-size:20px;margin-bottom:10px}.doc-info p{font-size:12px;color:#4a5568}.folio{background:#1a365d;color:white;padding:5px 15px;border-radius:5px;font-weight:bold;display:inline-block;margin-top:5px}.section{margin-bottom:25px}.section-title{background:#e2e8f0;color:#1a365d;padding:8px 15px;font-weight:bold;font-size:14px;margin-bottom:15px;border-left:4px solid #1a365d}.client-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 15px}.client-info p{font-size:13px}.client-info strong{color:#1a365d}.service-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:0 15px}.service-name{font-size:18px;font-weight:bold;color:#1a365d;margin-bottom:5px}.service-area{color:#4a5568;font-size:13px;margin-bottom:15px}.factors{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px;padding-bottom:15px;border-bottom:1px dashed #cbd5e0}.factor{text-align:center}.factor-label{font-size:11px;color:#718096}.factor-value{font-size:13px;font-weight:600;color:#2d3748}.price-section{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:15px}.price-box{background:white;border:2px solid #1a365d;border-radius:8px;padding:15px;text-align:center}.price-box.highlight{background:#1a365d;color:white}.price-label{font-size:12px;margin-bottom:5px}.price-box.highlight .price-label{color:#a0aec0}.price-value{font-size:22px;font-weight:bold}.price-box.highlight .price-value{color:white}.price-range{font-size:14px;color:#4a5568;margin-top:5px}.price-box.highlight .price-range{color:#cbd5e0}.notes{background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:15px;margin:20px 15px 0}.notes h4{color:#92400e;font-size:13px;margin-bottom:8px}.notes ul{font-size:12px;color:#78350f;padding-left:20px}.notes li{margin-bottom:3px}.includes{padding:0 15px;margin-top:20px}.includes h4{color:#1a365d;font-size:13px;margin-bottom:10px}.includes-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.includes p{font-size:12px;color:#4a5568}.includes p::before{content:"✓ ";color:#10b981;font-weight:bold}.footer{margin-top:40px;padding-top:20px;border-top:2px solid #e2e8f0}.footer-content{display:grid;grid-template-columns:1fr 1fr;gap:30px}.contact-info h4{color:#1a365d;font-size:13px;margin-bottom:10px}.contact-info p{font-size:12px;color:#4a5568;margin-bottom:3px}.validity{background:#f0fdf4;border:1px solid #10b981;border-radius:8px;padding:15px;text-align:center}.validity h4{color:#065f46;font-size:13px;margin-bottom:5px}.validity p{font-size:12px;color:#047857}.signature{margin-top:30px;text-align:center}.signature-line{border-top:1px solid #1a1a2e;width:250px;margin:40px auto 10px}.signature p{font-size:12px;color:#4a5568}.uf-note{text-align:center;font-size:11px;color:#718096;margin-top:20px}@media print{body{padding:20px}}</style></head>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;line-height:1.5;padding:40px;max-width:800px;margin:0 auto}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1a365d;padding-bottom:20px;margin-bottom:30px}.logo-section{display:flex;align-items:center;gap:15px}.company-info h1{color:#1a365d;font-size:20px;margin-bottom:5px}.company-info p{color:#4a5568;font-size:11px}.doc-info{text-align:right}.doc-info h2{color:#1a365d;font-size:20px;margin-bottom:10px}.doc-info p{font-size:12px;color:#4a5568}.folio{background:#1a365d;color:white;padding:5px 15px;border-radius:5px;font-weight:bold;display:inline-block;margin-top:5px}.section{margin-bottom:25px}.section-title{background:#e2e8f0;color:#1a365d;padding:8px 15px;font-weight:bold;font-size:14px;margin-bottom:15px;border-left:4px solid #1a365d}.client-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 15px}.client-info p{font-size:13px}.client-info strong{color:#1a365d}.service-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:0 15px}.service-name{font-size:18px;font-weight:bold;color:#1a365d;margin-bottom:5px}.service-area{color:#4a5568;font-size:13px;margin-bottom:15px}.factors{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px;padding-bottom:15px;border-bottom:1px dashed #cbd5e0}.factor{text-align:center}.factor-label{font-size:11px;color:#718096}.factor-value{font-size:13px;font-weight:600;color:#2d3748}.price-table{width:100%;border-collapse:collapse;margin-top:15px}.price-table th,.price-table td{padding:12px 15px;text-align:left;border-bottom:1px solid #e2e8f0}.price-table th{background:#f1f5f9;color:#475569;font-size:12px;font-weight:600}.price-table td{font-size:14px}.price-table .amount{text-align:right;font-weight:600}.price-table .total-row{background:#1a365d;color:white}.price-table .total-row td{font-size:16px;font-weight:bold;border:none}.price-table .uf-col{color:#059669;font-size:12px}.notes{background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:15px;margin:20px 15px 0}.notes h4{color:#92400e;font-size:13px;margin-bottom:8px}.notes ul{font-size:12px;color:#78350f;padding-left:20px}.notes li{margin-bottom:3px}.includes{padding:0 15px;margin-top:20px}.includes h4{color:#1a365d;font-size:13px;margin-bottom:10px}.includes-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.includes p{font-size:12px;color:#4a5568}.includes p::before{content:"✓ ";color:#10b981;font-weight:bold}.footer{margin-top:40px;padding-top:20px;border-top:2px solid #e2e8f0}.footer-content{display:grid;grid-template-columns:1fr 1fr;gap:30px}.contact-info h4{color:#1a365d;font-size:13px;margin-bottom:10px}.contact-info p{font-size:12px;color:#4a5568;margin-bottom:3px}.validity{background:#f0fdf4;border:1px solid #10b981;border-radius:8px;padding:15px;text-align:center}.validity h4{color:#065f46;font-size:13px;margin-bottom:5px}.validity p{font-size:12px;color:#047857}.signature{margin-top:30px;text-align:center}.signature-line{border-top:1px solid #1a1a2e;width:250px;margin:40px auto 10px}.signature p{font-size:12px;color:#4a5568}.uf-note{text-align:center;font-size:11px;color:#718096;margin-top:20px}@media print{body{padding:20px}}</style></head>
 <body><div class="header"><div class="logo-section"><div class="logo-container">${logoHeader}</div><div class="company-info"><h1>${datosEstudio.nombre}</h1><p>${datosEstudio.direccion}</p><p>${datosEstudio.telefono} | ${datosEstudio.email}</p>${datosEstudio.web?`<p>${datosEstudio.web}</p>`:''}</div></div><div class="doc-info"><h2>COTIZACIÓN</h2><p>Fecha: ${fecha}</p><div class="folio">${folio}</div></div></div>
 <div class="section"><div class="section-title">📋 DATOS DEL CLIENTE</div><div class="client-info"><p><strong>Nombre:</strong> ${datosCliente.nombre||'No especificado'}</p><p><strong>RUT:</strong> ${datosCliente.rut||'No especificado'}</p><p><strong>Teléfono:</strong> ${datosCliente.telefono||'No especificado'}</p><p><strong>Email:</strong> ${datosCliente.email||'No especificado'}</p></div></div>
-<div class="section"><div class="section-title">⚖️ SERVICIO COTIZADO</div><div class="service-box"><div class="service-name">${cotizacion.servicio}</div><div class="service-area">${cotizacion.area}</div><div class="factors"><div class="factor"><div class="factor-label">Complejidad</div><div class="factor-value">${cotizacion.complejidad}</div></div><div class="factor"><div class="factor-label">Ubicación</div><div class="factor-value">${cotizacion.ubicacion}</div></div><div class="factor"><div class="factor-label">Experiencia</div><div class="factor-value">${cotizacion.experiencia}</div></div></div><div class="price-section"><div class="price-box"><div class="price-label">Rango en Pesos Chilenos</div><div class="price-value">$${formatCLP(cotizacion.minCLP)}</div><div class="price-range">a $${formatCLP(cotizacion.maxCLP)}</div></div><div class="price-box highlight"><div class="price-label">Rango en UF</div><div class="price-value">${cotizacion.minUF} UF</div><div class="price-range">a ${cotizacion.maxUF} UF</div></div></div>${cotizacion.porcentaje?`<div class="notes" style="margin:15px 0 0 0;"><h4>⚡ Cuota Litis Adicional</h4><p style="font-size:13px;color:#92400e;">${cotizacion.porcentaje} sobre el monto obtenido</p></div>`:''}</div></div>
+<div class="section"><div class="section-title">⚖️ SERVICIO COTIZADO</div><div class="service-box"><div class="service-name">${cotizacion.servicio}</div><div class="service-area">${cotizacion.area}</div><div class="factors"><div class="factor"><div class="factor-label">Complejidad</div><div class="factor-value">${cotizacion.complejidad}</div></div><div class="factor"><div class="factor-label">Ubicación</div><div class="factor-value">${cotizacion.ubicacion}</div></div><div class="factor"><div class="factor-label">Experiencia</div><div class="factor-value">${cotizacion.experiencia}</div></div></div>
+<table class="price-table"><thead><tr><th>Concepto</th><th class="amount">Monto CLP</th><th class="amount">Equiv. UF</th></tr></thead><tbody><tr><td>Honorarios Profesionales (Neto)</td><td class="amount">$${formatCLP(neto)}</td><td class="amount uf-col">${ufNeto} UF</td></tr><tr><td>IVA (19%)</td><td class="amount">$${formatCLP(iva)}</td><td class="amount uf-col">-</td></tr><tr class="total-row"><td><strong>TOTAL A PAGAR</strong></td><td class="amount">$${formatCLP(total)}</td><td class="amount" style="color:#10b981">${ufTotal} UF</td></tr></tbody></table>
+${cotizacion.porcentaje?`<div class="notes" style="margin:15px 0 0 0;"><h4>⚡ Cuota Litis Adicional</h4><p style="font-size:13px;color:#92400e;">${cotizacion.porcentaje} sobre el monto obtenido (se suma al valor anterior)</p></div>`:''}</div></div>
 <div class="section"><div class="includes"><h4>✅ El servicio incluye:</h4><div class="includes-grid"><p>Asesoría legal completa</p><p>Redacción de documentos</p><p>Representación judicial</p><p>Seguimiento del caso</p><p>Comunicación constante</p><p>Primera instancia completa</p></div></div></div>
-<div class="notes" style="margin:20px 15px;"><h4>📝 Notas Importantes</h4><ul><li>Los honorarios no incluyen gastos de notaría, CBR, costas judiciales</li><li>Se puede acordar pago en cuotas según evaluación</li><li>El precio final depende de la complejidad específica del caso</li><li>IVA incluido en los valores mostrados (19%)</li></ul></div>
-<div class="footer"><div class="footer-content"><div class="contact-info"><h4>📞 Contacto</h4><p><strong>${datosEstudio.nombre}</strong></p><p>${datosEstudio.direccion}</p><p>Tel: ${datosEstudio.telefono}</p><p>Email: ${datosEstudio.email}</p>${datosEstudio.web?`<p>Web: ${datosEstudio.web}</p>`:''}</div><div class="validity"><h4>✅ Validez de la Cotización</h4><p>Esta cotización tiene validez de <strong>30 días</strong></p><p style="margin-top:10px;">Valores sujetos a variación según análisis detallado.</p></div></div><div class="signature"><div class="signature-line"></div><p><strong>${datosEstudio.nombre}</strong></p><p>Firma y Timbre</p></div></div>
-<p class="uf-note">Valor UF utilizado: $${formatCLP(valorUF)} (Fecha: ${fecha})</p></body></html>`;
+<div class="notes" style="margin:20px 15px;"><h4>📝 Notas Importantes</h4><ul><li>Los honorarios no incluyen gastos de notaría, CBR, costas judiciales ni otros gastos operacionales</li><li>Se puede acordar pago en cuotas según evaluación crediticia</li><li>El precio cotizado es válido para el caso descrito; variaciones pueden modificar el monto</li></ul></div>
+<div class="footer"><div class="footer-content"><div class="contact-info"><h4>📞 Contacto</h4><p><strong>${datosEstudio.nombre}</strong></p><p>${datosEstudio.direccion}</p><p>Tel: ${datosEstudio.telefono}</p><p>Email: ${datosEstudio.email}</p>${datosEstudio.web?`<p>Web: ${datosEstudio.web}</p>`:''}</div><div class="validity"><h4>✅ Validez de la Cotización</h4><p>Esta cotización tiene validez de <strong>30 días</strong></p><p style="margin-top:10px;">Valores sujetos a variación según análisis detallado del caso.</p></div></div><div class="signature"><div class="signature-line"></div><p><strong>${datosEstudio.nombre}</strong></p><p>Firma y Timbre</p></div></div>
+<p class="uf-note">Valor UF referencial: $${formatCLP(valorUF)} (Fecha: ${fecha})</p></body></html>`;
 const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const win=window.open(url,'_blank');setTimeout(()=>{if(win)win.print();},500);
 };
 function App(){
@@ -113,6 +121,7 @@ const[complejidad,setComplejidad]=useState('media');
 const[ubicacion,setUbicacion]=useState('santiago');
 const[experiencia,setExperiencia]=useState('medio');
 const[cliente,setCliente]=useState({nombre:'',rut:'',telefono:'',email:''});
+const[precioManual,setPrecioManual]=useState('');
 const[adminArea,setAdminArea]=useState('');
 const[adminServicio,setAdminServicio]=useState('');
 const logoInputRef=useRef(null);
@@ -124,8 +133,12 @@ const handleLogoUpload=(e)=>{const file=e.target.files?.[0];if(file){if(file.siz
 const eliminarLogo=()=>{setDatosEstudio(p=>({...p,logo:null}));if(logoInputRef.current)logoInputRef.current.value='';};
 const serviciosArea=areaSeleccionada?precios[areaSeleccionada]?.servicios||[]:[];
 const servicioActual=serviciosArea.find(s=>s.id===servicioSeleccionado);
-const resultado=useMemo(()=>{if(!servicioActual)return null;const mult=FACTORES.complejidad[complejidad].mult*FACTORES.ubicacion[ubicacion].mult*FACTORES.experiencia[experiencia].mult;const minCLP=Math.round(servicioActual.minCLP*mult/10000)*10000;const maxCLP=Math.round(servicioActual.maxCLP*mult/10000)*10000;return{minCLP,maxCLP,minUF:(minCLP/ufData.valor).toFixed(1),maxUF:(maxCLP/ufData.valor).toFixed(1),porcentaje:servicioActual.porcentaje};},[servicioActual,complejidad,ubicacion,experiencia,ufData.valor]);
-const handleGenerarPDF=()=>{if(!resultado)return;generarPDF({servicio:servicioActual.nombre,area:precios[areaSeleccionada].nombre,complejidad:FACTORES.complejidad[complejidad].nombre,ubicacion:FACTORES.ubicacion[ubicacion].nombre,experiencia:FACTORES.experiencia[experiencia].nombre,...resultado},cliente,datosEstudio,ufData.valor);};
+const resultado=useMemo(()=>{if(!servicioActual)return null;const mult=FACTORES.complejidad[complejidad].mult*FACTORES.ubicacion[ubicacion].mult*FACTORES.experiencia[experiencia].mult;const minCLP=Math.round(servicioActual.minCLP*mult/10000)*10000;const maxCLP=Math.round(servicioActual.maxCLP*mult/10000)*10000;const sugerido=Math.round((minCLP+maxCLP)/2/10000)*10000;return{minCLP,maxCLP,sugerido,porcentaje:servicioActual.porcentaje};},[servicioActual,complejidad,ubicacion,experiencia]);
+useEffect(()=>{if(resultado){setPrecioManual(resultado.sugerido.toString());}},[resultado?.sugerido]);
+const precioNeto=precioManual?parseInt(precioManual):resultado?.sugerido||0;
+const precioIVA=Math.round(precioNeto*IVA);
+const precioTotal=precioNeto+precioIVA;
+const handleGenerarPDF=()=>{if(!resultado||!precioNeto)return;generarPDF({servicio:servicioActual.nombre,area:precios[areaSeleccionada].nombre,complejidad:FACTORES.complejidad[complejidad].nombre,ubicacion:FACTORES.ubicacion[ubicacion].nombre,experiencia:FACTORES.experiencia[experiencia].nombre,precioNeto,porcentaje:resultado.porcentaje},cliente,datosEstudio,ufData.valor);};
 const actualizarPrecio=(area,id,campo,valor)=>{setPrecios(prev=>({...prev,[area]:{...prev[area],servicios:prev[area].servicios.map(s=>s.id===id?{...s,[campo]:valor,actualizado:new Date().toISOString().slice(0,7)}:s)}}));};
 const formatCLP=(n)=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);
 return(
@@ -170,13 +183,23 @@ return(
 </div>)}
 {resultado&&(
 <div className="bg-gradient-to-r from-emerald-600/30 to-blue-600/30 rounded-xl p-5 border border-emerald-400/30">
-<h2 className="text-lg font-bold text-white mb-4">💰 Estimación de Honorarios</h2>
-<div className="grid grid-cols-2 gap-4">
-<div className="bg-white/10 rounded-lg p-4 text-center"><p className="text-blue-200 text-xs mb-1">Pesos Chilenos</p><p className="text-xl font-bold text-white">{formatCLP(resultado.minCLP)}</p><p className="text-white">a {formatCLP(resultado.maxCLP)}</p></div>
-<div className="bg-white/10 rounded-lg p-4 text-center"><p className="text-blue-200 text-xs mb-1">Unidades de Fomento</p><p className="text-xl font-bold text-emerald-300">{resultado.minUF} UF</p><p className="text-emerald-300">a {resultado.maxUF} UF</p></div>
+<h2 className="text-lg font-bold text-white mb-4">💰 Definir Precio de Cotización</h2>
+<p className="text-blue-200 text-sm mb-3">Rango sugerido: {formatCLP(resultado.minCLP)} - {formatCLP(resultado.maxCLP)}</p>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+<div>
+<label className="block text-xs text-blue-200 mb-1">💵 Precio Neto (sin IVA)</label>
+<input type="number" value={precioManual} onChange={(e)=>setPrecioManual(e.target.value)} placeholder="Ingrese monto" className="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white text-lg font-bold focus:outline-none focus:ring-2 focus:ring-emerald-400"/>
+<p className="text-xs text-blue-300 mt-1">≈ {(precioNeto/ufData.valor).toFixed(2)} UF</p>
 </div>
-{resultado.porcentaje&&(<div className="mt-3 p-2 bg-amber-500/20 rounded-lg border border-amber-400/30"><p className="text-amber-200 text-sm">⚡ <strong>Cuota Litis:</strong> {resultado.porcentaje}</p></div>)}
-<button onClick={()=>setVista('cotizar')} className="mt-4 w-full py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white font-medium transition-all">📄 Generar Cotización PDF</button>
+<div className="bg-white/10 rounded-lg p-3">
+<div className="flex justify-between text-sm text-blue-200 mb-1"><span>Neto:</span><span>{formatCLP(precioNeto)}</span></div>
+<div className="flex justify-between text-sm text-blue-200 mb-1"><span>IVA (19%):</span><span>{formatCLP(precioIVA)}</span></div>
+<div className="flex justify-between text-lg font-bold text-emerald-300 pt-2 border-t border-white/20"><span>TOTAL:</span><span>{formatCLP(precioTotal)}</span></div>
+<p className="text-xs text-emerald-400 mt-1">≈ {(precioTotal/ufData.valor).toFixed(2)} UF</p>
+</div>
+</div>
+{resultado.porcentaje&&(<div className="p-2 bg-amber-500/20 rounded-lg border border-amber-400/30 mb-3"><p className="text-amber-200 text-sm">⚡ <strong>Cuota Litis adicional:</strong> {resultado.porcentaje}</p></div>)}
+<button onClick={()=>setVista('cotizar')} className="w-full py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white font-medium transition-all">📄 Continuar a Cotización</button>
 </div>)}
 </div>)}
 {vista==='cotizar'&&(
@@ -189,25 +212,34 @@ return(
 <input type="text" placeholder="Teléfono" value={cliente.telefono} onChange={(e)=>setCliente({...cliente,telefono:e.target.value})} className="p-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 <input type="email" placeholder="Email" value={cliente.email} onChange={(e)=>setCliente({...cliente,email:e.target.value})} className="p-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"/>
 </div></div>
-{resultado?(
+{resultado&&precioNeto?(
 <div className="bg-emerald-500/20 rounded-lg p-4 border border-emerald-400/30">
-<h3 className="font-bold text-white mb-2">📋 Resumen de Cotización</h3>
-<p className="text-blue-200"><strong>Servicio:</strong> {servicioActual?.nombre}</p>
-<p className="text-blue-200"><strong>Área:</strong> {precios[areaSeleccionada]?.nombre}</p>
-<p className="text-emerald-300 text-lg mt-2"><strong>{formatCLP(resultado.minCLP)} - {formatCLP(resultado.maxCLP)}</strong></p>
+<h3 className="font-bold text-white mb-3">📋 Resumen de Cotización</h3>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<p className="text-blue-200 text-sm"><strong>Servicio:</strong> {servicioActual?.nombre}</p>
+<p className="text-blue-200 text-sm"><strong>Área:</strong> {precios[areaSeleccionada]?.nombre}</p>
 {datosEstudio.logo&&(<p className="text-blue-300 text-sm mt-2">✅ Logo institucional incluido</p>)}
+</div>
+<div className="bg-white/10 rounded-lg p-3">
+<div className="flex justify-between text-sm text-blue-200 mb-1"><span>Honorarios Neto:</span><span className="font-semibold">{formatCLP(precioNeto)}</span></div>
+<div className="flex justify-between text-sm text-blue-200 mb-1"><span>IVA (19%):</span><span>{formatCLP(precioIVA)}</span></div>
+<div className="flex justify-between text-xl font-bold text-emerald-300 pt-2 border-t border-white/20"><span>TOTAL:</span><span>{formatCLP(precioTotal)}</span></div>
+<p className="text-xs text-emerald-400 text-right mt-1">≈ {(precioTotal/ufData.valor).toFixed(2)} UF</p>
+</div>
+</div>
 <button onClick={handleGenerarPDF} className="mt-4 w-full py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white font-bold text-lg transition-all">🖨️ Generar e Imprimir PDF</button>
 </div>
 ):(
 <div className="bg-amber-500/20 rounded-lg p-4 border border-amber-400/30 text-center">
-<p className="text-amber-200 mb-3">⚠️ Primero seleccione un servicio en "Calcular"</p>
+<p className="text-amber-200 mb-3">⚠️ Primero seleccione un servicio y defina el precio en "Calcular"</p>
 <button onClick={()=>setVista('calculadora')} className="px-4 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg text-white transition-all">Ir a Calculadora</button>
 </div>)}
 </div>)}
 {vista==='admin'&&(
 <div className="space-y-5">
 <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg p-4 border border-purple-400/30">
-<h3 className="font-bold text-white mb-3">🖼️ Logo Institucional (aparece en cotizaciones PDF)</h3>
+<h3 className="font-bold text-white mb-3">🖼️ Logo Institucional</h3>
 <div className="flex flex-col md:flex-row gap-4 items-center">
 <div className="flex-1">
 <input ref={logoInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" id="logo-upload"/>
@@ -218,11 +250,9 @@ return(
 {datosEstudio.logo&&(
 <div className="flex items-center gap-3">
 <div className="bg-white rounded-lg p-2"><img src={datosEstudio.logo} alt="Logo" className="h-16 max-w-32 object-contain"/></div>
-<button onClick={eliminarLogo} className="p-2 bg-red-500/50 hover:bg-red-500 rounded-lg text-white text-sm transition-all">🗑️ Eliminar</button>
+<button onClick={eliminarLogo} className="p-2 bg-red-500/50 hover:bg-red-500 rounded-lg text-white text-sm transition-all">🗑️</button>
 </div>)}
-</div>
-{!datosEstudio.logo&&(<p className="text-xs text-purple-300 mt-2">💡 Sin logo se usará el emoji ⚖️</p>)}
-</div>
+</div></div>
 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
 <h3 className="font-bold text-white mb-3">🏢 Datos del Estudio</h3>
 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -237,12 +267,10 @@ return(
 <h3 className="font-bold text-white mb-3">💵 Valor UF</h3>
 <div className="flex gap-3 flex-wrap">
 <input type="number" value={ufData.valor} onChange={(e)=>setUfData({...ufData,valor:Number(e.target.value),fecha:new Date().toISOString().slice(0,10)})} className="flex-1 min-w-32 p-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none"/>
-<button onClick={obtenerUF} disabled={cargandoUF} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white transition-all">{cargandoUF?'⏳ Cargando...':'🔄 Obtener de API'}</button>
-</div>
-<p className="text-xs text-blue-300 mt-2">API: mindicador.cl</p>
-</div>
+<button onClick={obtenerUF} disabled={cargandoUF} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white transition-all">{cargandoUF?'⏳':'🔄 API'}</button>
+</div></div>
 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-<h3 className="font-bold text-white mb-3">💰 Editar Precios</h3>
+<h3 className="font-bold text-white mb-3">💰 Editar Precios Base</h3>
 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
 <select value={adminArea} onChange={(e)=>{setAdminArea(e.target.value);setAdminServicio('');}} className="p-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none">
 <option value="">Seleccione área...</option>
@@ -254,10 +282,7 @@ return(
 {precios[adminArea]?.servicios.map(s=>(<option key={s.id} value={s.id}>{s.nombre}</option>))}
 </select>)}
 </div>
-{adminArea&&adminServicio&&(()=>{
-const servicio=precios[adminArea].servicios.find(s=>s.id===adminServicio);
-if(!servicio)return null;
-return(
+{adminArea&&adminServicio&&(()=>{const servicio=precios[adminArea].servicios.find(s=>s.id===adminServicio);if(!servicio)return null;return(
 <div className="bg-white/10 rounded-lg p-4">
 <h4 className="font-bold text-white mb-3">✏️ {servicio.nombre}</h4>
 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -265,18 +290,13 @@ return(
 <input type="number" value={servicio.minCLP} onChange={(e)=>actualizarPrecio(adminArea,servicio.id,'minCLP',Number(e.target.value))} className="w-full p-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none"/></div>
 <div><label className="block text-xs text-blue-200 mb-1">Precio Máximo (CLP)</label>
 <input type="number" value={servicio.maxCLP} onChange={(e)=>actualizarPrecio(adminArea,servicio.id,'maxCLP',Number(e.target.value))} className="w-full p-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none"/></div>
-<div><label className="block text-xs text-blue-200 mb-1">Cuota Litis (opcional)</label>
-<input type="text" value={servicio.porcentaje||''} placeholder="Ej: 10-20%" onChange={(e)=>actualizarPrecio(adminArea,servicio.id,'porcentaje',e.target.value||undefined)} className="w-full p-2 rounded-lg bg-white/20 border border-white/30 text-white focus:outline-none"/></div>
-<div className="flex items-end"><p className="text-sm text-emerald-300">≈ {(servicio.minCLP/ufData.valor).toFixed(1)} - {(servicio.maxCLP/ufData.valor).toFixed(1)} UF</p></div>
-</div>
-<p className="text-xs text-blue-300 mt-3">✅ Guardado automático | Actualización: {servicio.actualizado}</p>
-</div>);})()}
+</div></div>);})()}
 </div>
 <div className="flex gap-3 flex-wrap">
 <button onClick={()=>{const data=JSON.stringify({precios,datosEstudio,ufData},null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`backup-${new Date().toISOString().slice(0,10)}.json`;a.click();}} className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white font-medium transition-all">📥 Exportar</button>
 <label className="flex-1 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white font-medium text-center cursor-pointer transition-all">📤 Importar
 <input type="file" accept=".json" className="hidden" onChange={(e)=>{const file=e.target.files?.[0];if(file){const reader=new FileReader();reader.onload=(ev)=>{try{const data=JSON.parse(ev.target?.result);if(data.precios)setPrecios(data.precios);if(data.datosEstudio)setDatosEstudio(data.datosEstudio);if(data.ufData)setUfData(data.ufData);alert('✅ Importado');}catch{alert('❌ Error');}};reader.readAsText(file);}}}/></label>
-<button onClick={()=>{if(confirm('¿Restaurar valores por defecto?')){setPrecios(DEFAULT_PRECIOS);setDatosEstudio(DATOS_ESTUDIO_DEFAULT);alert('✅ Restaurado');}}} className="px-4 py-2 bg-red-500/50 hover:bg-red-500 rounded-lg text-white transition-all">🔄 Reset</button>
+<button onClick={()=>{if(confirm('¿Restaurar valores por defecto?')){setPrecios(DEFAULT_PRECIOS);setDatosEstudio(DATOS_ESTUDIO_DEFAULT);alert('✅ Restaurado');}}} className="px-4 py-2 bg-red-500/50 hover:bg-red-500 rounded-lg text-white transition-all">🔄</button>
 </div>
 </div>)}
 </div>
