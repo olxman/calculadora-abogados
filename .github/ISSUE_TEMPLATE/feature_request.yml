@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest an improvement or a new legal area / service
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the idea. Fee figures should stay referential estimates, not a binding tariff or legal advice.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Who would benefit, and what is missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the feature, legal area, or documentation change.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources or references
+      description: If you are proposing fee ranges, say where they come from (optional but helpful).

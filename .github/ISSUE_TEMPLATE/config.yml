@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Live demo
+    url: https://olxman.github.io/calculadora-abogados/
+    about: Open the public calculator (does not require a GitHub account).
+  - name: Security report
+    url: https://github.com/olxman/calculadora-abogados/security/advisories/new
+    about: Report a vulnerability privately instead of opening a public issue.

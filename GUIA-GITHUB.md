@@ -1,219 +1,116 @@
-# 📚 GUÍA COMPLETA: Subir Calculadora a GitHub Pages
+# Guía: publicar una copia en GitHub Pages
 
-## 🎯 Resultado Final
-Tu calculadora estará disponible en: `https://TU-USUARIO.github.io/calculadora-abogados`
+La demo oficial de LexCalc ya está en:
 
----
+**https://olxman.github.io/calculadora-abogados/**
 
-## 📋 OPCIÓN 1: Subir desde la Web (Sin instalar nada)
+Esta guía es para quien quiera **publicar su propia copia** (por ejemplo, un fork con los datos de su estudio). No necesitas estos pasos para usar la calculadora oficial.
 
-### Paso 1: Crear cuenta en GitHub
-1. Ve a [github.com](https://github.com)
-2. Click en "Sign up"
-3. Completa el registro con tu email
-
-### Paso 2: Crear repositorio nuevo
-1. Inicia sesión en GitHub
-2. Click en el botón verde **"New"** o ve a [github.com/new](https://github.com/new)
-3. Configura:
-   - **Repository name:** `calculadora-abogados`
-   - **Description:** `Calculadora de honorarios legales Chile`
-   - **Public** ✓ (marcado)
-   - **Add a README file** ✓ (marcado)
-4. Click **"Create repository"**
-
-### Paso 3: Subir archivos
-1. En tu nuevo repositorio, click en **"Add file"** → **"Upload files"**
-2. Arrastra estos archivos:
-   - `index.html`
-   - `README.md`
-3. En "Commit changes", escribe: `Agregar calculadora de honorarios`
-4. Click **"Commit changes"**
-
-### Paso 4: Subir carpeta .github
-1. Click en **"Add file"** → **"Create new file"**
-2. En el nombre escribe: `.github/workflows/deploy.yml`
-3. Copia y pega este contenido:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-      
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-```
-
-4. Click **"Commit changes"**
-
-### Paso 5: Activar GitHub Pages
-1. Ve a **Settings** (⚙️ en tu repositorio)
-2. En el menú lateral izquierdo, click en **"Pages"**
-3. En **"Source"**, selecciona **"GitHub Actions"**
-4. ¡Listo! Espera 2-3 minutos
-
-### Paso 6: Ver tu sitio
-1. Ve a la pestaña **"Actions"** en tu repositorio
-2. Verás un workflow ejecutándose (punto amarillo)
-3. Cuando termine (punto verde ✓), tu sitio estará en:
-   
-   **`https://TU-USUARIO.github.io/calculadora-abogados`**
+El flujo de despliegue del repositorio es [`.github/workflows/static.yml`](.github/workflows/static.yml).
 
 ---
 
-## 📋 OPCIÓN 2: Subir desde Terminal (Para usuarios avanzados)
+## Opción 1: fork desde la web (sin instalar nada)
 
-### Requisitos
-- Git instalado ([descargar](https://git-scm.com/downloads))
-- Cuenta de GitHub
+1. Entra a [github.com/olxman/calculadora-abogados](https://github.com/olxman/calculadora-abogados) e inicia sesión.
+2. Pulsa **Fork** y crea el fork en tu cuenta.
+3. En tu fork, ve a **Settings → Pages**.
+4. En **Source**, elige **GitHub Actions**.
+5. Si el flujo no corre solo, ve a la pestaña **Actions** y ejecuta **Deploy static content to Pages**.
+6. En unos minutos tu copia estará en:
 
-### Comandos
+   `https://TU-USUARIO.github.io/calculadora-abogados/`
+
+   (cambia `TU-USUARIO` por tu usuario de GitHub.)
+
+### Actualizar el código en tu fork
+
+1. Abre `index.html` en tu repositorio.
+2. Pulsa el lápiz (Edit), haz el cambio y confirma con **Commit changes**.
+3. El sitio se actualiza solo en 2–3 minutos. Si no ves el cambio, recarga forzada (Ctrl+Shift+R o Cmd+Shift+R).
+
+---
+
+## Opción 2: clonar con Git
+
+Requisitos: [Git](https://git-scm.com/downloads) y una cuenta de GitHub.
 
 ```bash
-# 1. Crear carpeta y entrar
-mkdir calculadora-abogados
+git clone https://github.com/olxman/calculadora-abogados.git
 cd calculadora-abogados
+```
 
-# 2. Copiar los archivos index.html, README.md aquí
-# (También crear la carpeta .github/workflows/ con deploy.yml)
+Si vas a publicar tu propia copia, crea un repositorio vacío en tu cuenta, apunta el remoto y sube `main`:
 
-# 3. Inicializar Git
-git init
-
-# 4. Agregar archivos
-git add .
-
-# 5. Hacer commit
-git commit -m "Calculadora de honorarios legales Chile"
-
-# 6. Crear rama main
-git branch -M main
-
-# 7. Conectar con GitHub (reemplaza TU-USUARIO)
+```bash
+git remote rename origin upstream
 git remote add origin https://github.com/TU-USUARIO/calculadora-abogados.git
-
-# 8. Subir
 git push -u origin main
 ```
 
-### Luego activa GitHub Pages:
-1. Ve a Settings → Pages
-2. Source: GitHub Actions
-3. Espera 2-3 minutos
+Luego activa GitHub Pages como en la opción 1 (Settings → Pages → GitHub Actions).
+
+Para contribuir al proyecto original, no hace falta cambiar el remoto: haz un fork en GitHub, clona **tu fork** y abre un pull request hacia [olxman/calculadora-abogados](https://github.com/olxman/calculadora-abogados). Ver [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
-## 🔧 ACTUALIZAR LA CALCULADORA
+## Usar la calculadora sin publicarla
 
-### Actualizar precios desde la web:
-1. Abre tu calculadora en el navegador
-2. Ve a **⚙️ Admin**
-3. Edita los precios que necesites
-4. Los cambios se guardan automáticamente en tu navegador
+Abre `index.html` en el navegador, o en la carpeta del proyecto ejecuta:
 
-### Actualizar el código en GitHub:
-1. Ve a tu repositorio en GitHub
-2. Click en el archivo `index.html`
-3. Click en el lápiz ✏️ (Edit)
-4. Haz los cambios
-5. Click **"Commit changes"**
-6. El sitio se actualiza automáticamente en 2-3 minutos
+```bash
+python3 -m http.server 8080
+```
+
+y entra a [http://localhost:8080](http://localhost:8080).
 
 ---
 
-## 💾 BACKUP DE TUS DATOS
+## Configuración y cotizaciones
 
-### Exportar configuración:
-1. Ve a **⚙️ Admin**
-2. Click en **📥 Exportar Config**
-3. Se descarga un archivo JSON con todos tus precios
+1. En la app, abre **Configuración**.
+2. Completa los datos y el logo de tu estudio. Aparecerán en el PDF.
+3. Pulsa **Actualizar UF** para traer el valor oficial desde [mindicador.cl](https://mindicador.cl), o ingresa el valor a mano.
+4. Arma la cotización y pulsa **Generar PDF**. El navegador puede pedir permiso para ventanas emergentes.
 
-### Importar configuración:
-1. Ve a **⚙️ Admin**
-2. Click en **📤 Importar Config**
-3. Selecciona tu archivo JSON de backup
+Los datos de la sesión viven en el navegador. Si recargas la página, vuelven los valores por defecto que están en `index.html`.
 
 ---
 
-## ❓ SOLUCIÓN DE PROBLEMAS
+## Problemas frecuentes
 
 ### "El sitio no carga"
-- Espera 5 minutos después de activar Pages
-- Verifica que la URL sea correcta
-- Revisa la pestaña "Actions" por errores
+
+- Espera unos minutos después de activar Pages.
+- Revisa que la URL use tu usuario de GitHub.
+- Mira la pestaña **Actions** por si el flujo falló.
 
 ### "Los cambios no se ven"
-- Limpia la caché del navegador (Ctrl+Shift+R)
-- Espera 2-3 minutos después de hacer commit
+
+- Espera 2–3 minutos después del commit.
+- Limpia la caché del navegador (Ctrl+Shift+R o Cmd+Shift+R).
 
 ### "Error en GitHub Actions"
-- Verifica que el archivo `deploy.yml` esté exactamente como se muestra
-- Revisa que esté en la carpeta `.github/workflows/`
 
-### "Se perdieron mis precios"
-- Los precios se guardan en localStorage del navegador
-- Si cambias de navegador/dispositivo, usa Importar/Exportar
-- Haz backups regulares con "Exportar Config"
+- El archivo de despliegue debe ser `.github/workflows/static.yml`.
+- En Settings → Pages, la fuente debe ser **GitHub Actions**.
 
----
+### "No se genera el PDF"
 
-## 📱 USAR EN CELULAR
-
-La calculadora funciona perfectamente en celulares:
-1. Abre la URL en el navegador de tu celular
-2. Para "instalar" como app:
-   - **iPhone:** Compartir → Agregar a inicio
-   - **Android:** Menú ⋮ → Agregar a pantalla de inicio
+- Permite ventanas emergentes para el sitio.
+- Prueba en Chrome, Firefox, Edge o Safari actualizados.
 
 ---
 
-## 🎉 ¡LISTO!
+## Usar en el celular
 
-Tu calculadora de honorarios está funcionando en:
+La calculadora funciona en el navegador del teléfono. Para fijarla como acceso directo:
 
-**`https://TU-USUARIO.github.io/calculadora-abogados`**
-
-Características:
-✅ Funciona sin servidor
-✅ Gratis para siempre
-✅ Se actualiza automáticamente
-✅ Datos guardados en el navegador
-✅ Exportar/Importar configuración
-✅ Genera PDFs profesionales
+- **iPhone:** Compartir → Agregar a inicio
+- **Android:** menú ⋮ → Agregar a pantalla de inicio
 
 ---
 
-## 📞 Soporte
+## Licencia y soporte
 
-¿Problemas? Abre un Issue en tu repositorio o contacta al desarrollador.
+El proyecto es de [código abierto (MIT)](LICENSE). Problemas o ideas: abre un [issue](https://github.com/olxman/calculadora-abogados/issues) en el repositorio original.

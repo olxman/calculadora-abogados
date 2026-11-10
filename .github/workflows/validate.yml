@@ -1,0 +1,75 @@
+name: Validate HTML and docs
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required files and live-app contract
+        run: |
+          set -euo pipefail
+
+          test -f index.html
+          test -f LICENSE
+          test -f README.md
+          test -f .github/workflows/static.yml
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          errors = []
+
+          html = Path("index.html").read_text(encoding="utf-8", errors="replace")
+          if not html.lstrip().lower().startswith("<!doctype html>"):
+              errors.append("index.html must start with <!DOCTYPE html>")
+          if "<div id=\"root\">" not in html and "<div id='root'>" not in html:
+              errors.append("index.html is missing the React root element")
+          if "LexCalc" not in html:
+              errors.append("index.html is missing the LexCalc title/brand")
+          if "mindicador.cl/api/uf" not in html:
+              errors.append("index.html no longer references the mindicador.cl UF API")
+
+          demo = "https://olxman.github.io/calculadora-abogados/"
+          clone = "https://github.com/olxman/calculadora-abogados"
+          for path in [
+              "README.md",
+              "GUIA-GITHUB.md",
+              "CONTRIBUTING.md",
+              "SECURITY.md",
+              "CHANGELOG.md",
+          ]:
+              text = Path(path).read_text(encoding="utf-8")
+              if "TU-USUARIO.github.io" in text or "github.com/TU-USUARIO/calculadora-abogados" in text:
+                  # Allowed only as a clearly labeled placeholder for *forks* in the guide
+                  if path != "GUIA-GITHUB.md":
+                      errors.append(f"{path} still has a TU-USUARIO placeholder for the official repo")
+              if path == "README.md":
+                  if demo.rstrip("/") not in text:
+                      errors.append("README.md is missing the official demo URL")
+                  if clone not in text:
+                      errors.append("README.md is missing the official clone URL")
+
+          license_text = Path("LICENSE").read_text(encoding="utf-8")
+          if "MIT License" not in license_text:
+              errors.append("LICENSE does not look like an MIT license")
+          if "Pablo Riquelme" not in license_text:
+              errors.append("LICENSE is missing the copyright holder")
+
+          if errors:
+              print("\n".join(errors))
+              sys.exit(1)
+          print("Validation passed.")
+          PY
